@@ -20,32 +20,24 @@ const getUsers = async (req, res) => {
 const handleSignin = async (req, res) => {
     const { email, password } = req.body;
     try {
-        const [rows] = await db.query("SELECT * FROM customers WHERE email = ?", [email]);
-
-        if (rows.length === 0) {
-            return res.status(400).json({ error: "User not found" });
+        const callProcedureQuery = 'CALL signin_user(?, ?, @customerId);';
+        await db.query(callProcedureQuery, [email, password]);
+        const selectQuery = 'SELECT @customerId AS customerId;';
+        const [rows] = await db.query(selectQuery);
+        console.log("rows:", rows);
+        const customerId = rows[0]?.customerId;
+        console.log("customerId:", customerId);
+        if (!customerId) {
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
-
-        const user = rows[0];
-
-        // Compare hashed password
-        const match = await bcrypt.compare(password, user.hashed_pswd);
-        if (!match) {
-            return res.status(401).json({ error: "Invalid password" });
-        }
-
-        else console.log("User found");
-
-        res.cookie("token", user.customer_id, {
+        res.cookie("token",customerId, {
             httpOnly: true,
             secure: false,
             maxAge: 3600000,
             sameSite: "Strict",
         });
 
-        console
-
-        return res.status(200).json({token: user.customer_id });
+        return res.status(200).json({token: customerId});
     } catch (error) {
         console.error("Signin error:", error);
         return res.status(500).json({ error: "Internal server error" });
@@ -59,17 +51,17 @@ const handleLogout = (req, res) => {
 };
 
 const handleSignup = async (req, res) => {
-    const { firstName,lastName, email, password } = req.body;
+    const { firstName, lastName, email, phone, address, password } = req.body;
 
     try {
         if (!firstName || !email || !password) {
             return res.status(400).json({
                 error: "Missing required fields",
-                message: "Please provide name, email, and password",
+                message: "Please provide first name, email, and password",
             });
         }
 
-        // Email format validation
+       
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             return res.status(400).json({
@@ -78,37 +70,36 @@ const handleSignup = async (req, res) => {
             });
         }
 
-        // Check if user already exists
-        const [existingUsers] = await db.query("SELECT email FROM customers WHERE email = ?", [email]);
+     
+        const [rows] = await db.query(
+            'CALL signup_user(?, ?, ?, ?, ?, ?, @customerId);',
+            [firstName, lastName, email, phone, address, password]
+        );
+        const selectQuery = 'SELECT @customerId AS customerId;';
+        const [rows1] = await db.query(selectQuery);
+        console.log(rows1);
+        const customerId = rows1[0].customerId;
 
-        if (existingUsers.length > 0) {
+        if (!customerId) {
             return res.status(400).json({
-                error: "Email is already in use",
-                message: "The email address you entered is already associated with an existing account.",
+                error: "Signup failed",
+                message: "An unexpected error occurred during signup.",
             });
         }
 
-        // Hash password
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-        // Insert new user into database
-        await db.query(
-            "INSERT INTO customers (first_name,last_name, email, hashed_pswd) VALUES (?, ?, ?, ?)",
-            [firstName,lastName, email.toLowerCase(), hashedPassword]
-        );
-
         return res.status(201).json({
             message: "Signup successful. You can now sign in.",
+            customerId: customerId,
         });
     } catch (error) {
         console.error("Signup error:", error);
         return res.status(500).json({
-            error: "Failed to create user",
+            error: "Internal server error",
             message: "An unexpected error occurred. Please try again.",
         });
     }
 };
+
 
 module.exports = {
     getUsers,
