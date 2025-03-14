@@ -17,6 +17,53 @@ const getUsers = async (req, res) => {
     }
 };
 
+const getUser = async (req, res) => {
+    try {
+        const {customer_id} = req.params;
+
+        // Fetch user details
+        const [userRows] = await db.query(
+            "SELECT * FROM customers WHERE customer_id = ?", 
+            [customer_id]
+        );
+        if (userRows.length === 0) {
+            return res.status(404).json({ status: "error", message: "User not found" });
+        }
+        // Fetch accounts linked to the user
+        const [accounts] = await db.query(
+            "SELECT * FROM accounts WHERE customer_id = ?", 
+            [customer_id]
+        );
+        if (accounts.length === 0) {
+            return res.status(200).json({
+                status: "success",
+                data: {
+                    user: userRows[0],
+                    accounts: [],
+                    transactions: []
+                },
+            });
+        }
+        const accountIds = accounts.map(acc => acc.account_id);
+        const [transactions] = await db.query(
+            "SELECT * FROM transactions WHERE source_id IN (?) OR destination_id IN (?)", 
+            [accountIds, accountIds]
+        );
+        res.status(200).json({
+            status: "success",
+            data: {
+                user: userRows[0],
+                accounts,
+                transactions,
+            },
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+
 const handleSignin = async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -101,4 +148,5 @@ module.exports = {
     handleSignup,
     handleSignin,
     handleLogout,
+    getUser,
 };
