@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useEffect } from 'react';
 import { DatabaseIcon, WalletCards, ArrowUpRight, ArrowDownLeft, History, PiggyBank, BanknoteIcon } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -6,11 +7,18 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 
 const Dashboard = () => {
+  const [customerId, setCustomerId] = useState(null);
   const [selectedAction, setSelectedAction] = useState(null);
   const [amount, setAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [recipientEmail, setRecipientEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const id = localStorage.getItem('customerId'); 
+    if (id) {
+      setCustomerId(id); 
+    }
+  }, []);
 
   const handleLogout = async () => {
     localStorage.removeItem('token');
@@ -23,7 +31,7 @@ const Dashboard = () => {
     setIsLoading(true);
 
     try {
-      const endpoint = `http://localhost:3000/${selectedAction}`;
+      const endpoint = `http://localhost:4000/${selectedAction}`;
       const data = { amount, recipientEmail };
       const response = await axios.post(endpoint, data, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }

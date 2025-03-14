@@ -26,12 +26,12 @@ const SignUp = () => {
 
     try {
       const response = await axios.post('http://localhost:4000/user/signup', formData);
-      if (response.data.status) {
+      if (response.data.message) {
         toast.success('Account created successfully!');
         navigate('/signin');
       }
     } catch (error) {
-      toast.error('Failed to create account. Please try again.');
+      toast.error(error.response.data.message);
     } finally {
       setIsLoading(false);
     }

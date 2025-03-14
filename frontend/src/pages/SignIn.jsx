@@ -35,7 +35,8 @@ const SignIn = () => {
       console.log(response.data);
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
-        
+        console.log(response.data.id);
+        localStorage.setItem('customerId', response.data.id);
         toast.success('Successfully signed in!');
         navigate('/dashboard');
       }

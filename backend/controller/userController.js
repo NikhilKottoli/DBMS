@@ -30,14 +30,15 @@ const handleSignin = async (req, res) => {
         if (!customerId) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
-        res.cookie("token",customerId, {
+        const hashedToken = await bcrypt.hash(customerId.toString(), 1);
+        res.cookie("token",hashedToken, {
             httpOnly: true,
             secure: false,
             maxAge: 3600000,
             sameSite: "Strict",
         });
 
-        return res.status(200).json({token: customerId});
+        return res.status(200).json({token: hashedToken,id : customerId});
     } catch (error) {
         console.error("Signin error:", error);
         return res.status(500).json({ error: "Internal server error" });
@@ -52,7 +53,6 @@ const handleLogout = (req, res) => {
 
 const handleSignup = async (req, res) => {
     const { firstName, lastName, email, phone, address, password } = req.body;
-
     try {
         if (!firstName || !email || !password) {
             return res.status(400).json({
@@ -60,26 +60,23 @@ const handleSignup = async (req, res) => {
                 message: "Please provide first name, email, and password",
             });
         }
-
-       
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
+        const [rows] =await db.query(
+                'select validate_email(?) as isvalid',[email]
+        );
+        if (rows[0].isvalid === 0) {
             return res.status(400).json({
-                error: "Invalid email format",
-                message: "Please provide a valid email address",
+                error: "Invalid email",
+                message: "Invalid email format",
             });
         }
-
-     
-        const [rows] = await db.query(
+        await db.query(
             'CALL signup_user(?, ?, ?, ?, ?, ?, @customerId);',
             [firstName, lastName, email, phone, address, password]
         );
+
         const selectQuery = 'SELECT @customerId AS customerId;';
         const [rows1] = await db.query(selectQuery);
-        console.log(rows1);
         const customerId = rows1[0].customerId;
-
         if (!customerId) {
             return res.status(400).json({
                 error: "Signup failed",
@@ -89,13 +86,11 @@ const handleSignup = async (req, res) => {
 
         return res.status(201).json({
             message: "Signup successful. You can now sign in.",
-            customerId: customerId,
         });
-    } catch (error) {
-        console.error("Signup error:", error);
+    } catch (error) { 
         return res.status(500).json({
             error: "Internal server error",
-            message: "An unexpected error occurred. Please try again.",
+            message: error.message,
         });
     }
 };
