@@ -25,7 +25,7 @@ const SignUp = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:4000/user/signup', formData);
+      const response = await axios.post('http://localhost:3000/user/signup', formData);
       if (response.data.message) {
         toast.success('Account created successfully!');
         navigate('/signin');

@@ -31,7 +31,7 @@ const SignIn = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:4000/user/signin', formData);
+      const response = await axios.post('http://localhost:3000/user/signin', formData);
       console.log(response.data);
       if (response.data.id) {
         localStorage.setItem('customerId', response.data.id);

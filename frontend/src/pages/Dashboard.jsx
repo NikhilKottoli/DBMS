@@ -5,18 +5,23 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import Button from '../components/Button';
 import Input from '../components/Input';
+import { use } from 'react';
 
 const Dashboard = () => {
-  const [customerId, setCustomerId] = useState(null);
+  const [customerId, setCustomerId] = useState(localStorage.getItem('customerId'));
   const [selectedAction, setSelectedAction] = useState(null);
   const [amount, setAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [recipientEmail, setRecipientEmail] = useState('');
   const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const id = localStorage.getItem('customerId'); 
     if (id) {
       setCustomerId(id); 
+    }
+    else {
+      window.location.href = '/signin';
     }
   }, []);
 
@@ -26,12 +31,29 @@ const Dashboard = () => {
     window.location.href = '/signin';
   };
 
+  useEffect (() => {
+    const fetchAccounts = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/account/getAccount/${customerId}`, {
+        });
+        console.log(response.data);
+        if(response.data.data.accounts.length === 0) {
+          window.location.href = '/accounts';
+        }
+      } catch (error) {
+        console.error('Failed to fetch accounts:', error);
+      }
+    }
+    fetchAccounts();
+  }, [customerId]);
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const endpoint = `http://localhost:4000/${selectedAction}`;
+      const endpoint = `http://localhost:3000/${selectedAction}`;
       const data = { amount, recipientEmail };
       const response = await axios.post(endpoint, data, {
         headers: { Authorization: `Bearer ${localStorage.getItem('customerId')}` }
