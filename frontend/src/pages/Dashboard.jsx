@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import { use } from 'react';
+import Navbar from '../components/Navbar';
 
 const Dashboard = () => {
   const [customerId, setCustomerId] = useState(localStorage.getItem('customerId'));
@@ -119,25 +120,11 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-6">
+      <Navbar />
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <DatabaseIcon className="w-10 h-10 text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">StreamQuery</h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <WalletCards className="w-6 h-6 text-blue-600" />
-            <span className="text-lg font-semibold text-gray-700">Balance: $10,000</span>
-            <button
-                onClick={handleLogout}
-                disabled={loading}
-                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300 disabled:opacity-50"
-                >
-                {loading ? "Logging out..." : "Logout"}
-            </button>
-            <button onClick={handleProfile} className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300">
-              Profile
-            </button>
+            
           </div>
         </div>
 

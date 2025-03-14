@@ -1,0 +1,61 @@
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { DatabaseIcon, Menu, X } from "lucide-react";
+
+export default function Navbar() {
+  const [loading, setLoading] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    localStorage.removeItem("token");
+    setLoading(true);
+    navigate("/signin");
+  };
+
+  return (
+    <nav className="bg-white shadow-md sticky top-0 z-50 w-full">
+      <div className="flex justify-between items-center px-8 py-4 w-full">
+        {/* Logo */}
+        <div className="flex items-center gap-4">
+          <DatabaseIcon className="w-10 h-10 text-blue-600" />
+          <h1 className="text-2xl font-bold text-gray-900">StreamQuery</h1>
+        </div>
+
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center space-x-12">
+          <Link
+            to="/dashboard"
+            className="px-6 py-2 rounded-lg text-gray-700 font-medium transition duration-300 hover:bg-blue-500 hover:text-white"
+          >
+            Home
+          </Link>
+          <Link
+            to="/profile"
+            className="px-6 py-2 rounded-lg text-gray-700 font-medium transition duration-300 hover:bg-blue-500 hover:text-white"
+          >
+            Profile
+          </Link>
+          <Link
+            to="/accounts"
+            className="px-6 py-2 rounded-lg text-gray-700 font-medium transition duration-300 hover:bg-blue-500 hover:text-white"
+          >
+            Open Account
+          </Link>
+          <Link
+            to="/signup"
+            className="px-6 py-2 rounded-lg text-gray-700 font-medium transition duration-300 hover:bg-blue-500 hover:text-white"
+          >
+            Sign Up
+          </Link>
+          <Link
+            to="/about"
+            className="px-6 py-2 rounded-lg text-gray-700 font-medium transition duration-300 hover:bg-blue-500 hover:text-white"
+          >
+            About Us
+          </Link>
+        </div>
+      </div>
+    </nav>
+  );
+}

@@ -4,6 +4,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import Button from '../components/Button';
 import Input from '../components/Input';
+import Navbar from '../components/Navbar';
 
 const Accounts = () => {
   
@@ -96,16 +97,10 @@ const Accounts = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-6">
+      <Navbar />
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <DatabaseIcon className="w-10 h-10 text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">StreamQuery</h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <Wallet className="w-6 h-6 text-blue-600" />
-            <span className="text-lg font-semibold text-gray-700">Open New Account</span>
-          </div>
+          
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DatabaseIcon, User as UserIcon, CreditCard, History, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import Navbar from '../components/Navbar';
 
 const User = () => {
     const [userData, setUserData] = useState(null);
@@ -53,17 +54,10 @@ const User = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-6">
+      <Navbar />
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <DatabaseIcon className="w-10 h-10 text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">StreamQuery</h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <a href="/dashboard" className="flex items-center gap-2">
-                <span className="text-lg font-semibold text-white bg-gray-500 p-3 rounded-3xl">Dashboard</span>
-            </a>
-          </div>
+          
         </div>
 
         {userData && (
