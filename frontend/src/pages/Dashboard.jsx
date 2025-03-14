@@ -21,7 +21,7 @@ const Dashboard = () => {
   }, []);
 
   const handleLogout = async () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('customerId');
     setLoading(true);
     window.location.href = '/signin';
   };
@@ -34,7 +34,7 @@ const Dashboard = () => {
       const endpoint = `http://localhost:4000/${selectedAction}`;
       const data = { amount, recipientEmail };
       const response = await axios.post(endpoint, data, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('customerId')}` }
       });
       
       if (response.data) {

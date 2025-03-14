@@ -30,15 +30,15 @@ const handleSignin = async (req, res) => {
         if (!customerId) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
-        const hashedToken = await bcrypt.hash(customerId.toString(), 1);
-        res.cookie("token",hashedToken, {
+        
+        res.cookie("id",customerId, {
             httpOnly: true,
             secure: false,
             maxAge: 3600000,
             sameSite: "Strict",
         });
 
-        return res.status(200).json({token: hashedToken,id : customerId});
+        return res.status(200).json({id : customerId});
     } catch (error) {
         console.error("Signin error:", error);
         return res.status(500).json({ error: "Internal server error" });
@@ -47,7 +47,7 @@ const handleSignin = async (req, res) => {
 
 const handleLogout = (req, res) => {
     console.log("Logging out");    
-    res.clearCookie("token");
+    res.clearCookie("id");
     return res.status(200).json({ message: "Logged out successfully" });
 };
 
@@ -61,7 +61,7 @@ const handleSignup = async (req, res) => {
             });
         }
         const [rows] =await db.query(
-                'select validate_email(?) as isvalid',[email]
+                'select valisdate_email(?) as isvalid',[email]
         );
         if (rows[0].isvalid === 0) {
             return res.status(400).json({
