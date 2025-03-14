@@ -20,7 +20,7 @@ const SignIn = () => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('customerId');
     if (token) {
         navigate('/dashboard');
     }
@@ -31,11 +31,10 @@ const SignIn = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/user/signin', formData);
+      const response = await axios.post('http://localhost:4000/user/signin', formData);
       console.log(response.data);
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        
+      if (response.data.id) {
+        localStorage.setItem('customerId', response.data.id);
         toast.success('Successfully signed in!');
         navigate('/dashboard');
       }
