@@ -61,7 +61,7 @@ const handleSignup = async (req, res) => {
             });
         }
         const [rows] =await db.query(
-                'select valisdate_email(?) as isvalid',[email]
+                'select validate_email(?) as isvalid',[email]
         );
         if (rows[0].isvalid === 0) {
             return res.status(400).json({
