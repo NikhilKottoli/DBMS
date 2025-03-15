@@ -164,21 +164,23 @@ DELIMITER ;
 
 ### Open Account
 ```sql
-DELIMITER ><
-CREATE PROCEDURE open_account(
-    IN customerId INT,
-    IN accountType ENUM('savings','current'),
-    IN initialDeposit DECIMAL(10,2)
-)
-BEGIN
-    DECLARE acc_no VARCHAR(20);
-    SET acc_no = generate_acc_no();
-    INSERT INTO accounts (account_number, customer_id, account_type, balance)
-    VALUES (acc_no, customerId, accountType, initialDeposit);
-    INSERT INTO logs (description)
-    VALUES (CONCAT('Account opened for customer ID: ', customerId, ' with initial balance ', initialDeposit));
-END ><
-DELIMITER ;
+delimiter ><
+create procedure open_account(
+	in customerId int,
+	in accountType enum('savings','current'),
+	in initialDeposit decimal(10,2),
+	out accountId int)
+begin
+	declare acc_no varchar(20);
+	declare accId int;
+	set acc_no = generate_acc_no();
+	insert into accounts (account_number, customer_id, account_type, balance) values (acc_no,customerId,accountType,initialDeposit);
+	insert into logs (description)
+    	values (concat('account opened for customer id: ', customerId,'with initial balance',initialDeposit));
+	select account_id into accountId from accounts where customer_id = customerId order by created_at desc limit 1;
+
+end ><
+delimiter ;
 ```
 
 ### Deposit Money
