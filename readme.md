@@ -31,7 +31,7 @@ CREATE TABLE accounts (
     account_number VARCHAR(20) NOT NULL UNIQUE,
     customer_id INT NOT NULL,
     account_type ENUM('savings', 'current') NOT NULL,
-    balance DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    balance DECIMAL(15,2) NOT NULL DEFAULT 0.00,
     status ENUM('active', 'closed') DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
@@ -45,7 +45,7 @@ CREATE TABLE transactions (
     source_id INT,
     destination_id INT,
     transaction_type ENUM('deposit', 'withdraw', 'transfer') NOT NULL,
-    amount DECIMAL(10,2) NOT NULL,
+    amount DECIMAL(15,2) NOT NULL,
     transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (source_id) REFERENCES accounts(account_id),
     FOREIGN KEY (destination_id) REFERENCES accounts(account_id)
@@ -168,7 +168,7 @@ delimiter ><
 create procedure open_account(
 	in customerId int,
 	in accountType enum('savings','current'),
-	in initialDeposit decimal(10,2),
+	in initialDeposit decimal(15,2),
 	out accountId int)
 begin
 	declare acc_no varchar(20);
@@ -188,7 +188,7 @@ delimiter ;
 DELIMITER ><
 CREATE PROCEDURE deposit_money(
     IN accountId INT,
-    IN amount DECIMAL(10,2)
+    IN amount DECIMAL(15,2)
 )
 BEGIN
     UPDATE accounts
@@ -207,10 +207,32 @@ DELIMITER ;
 DELIMITER ><
 CREATE PROCEDURE withdraw_money(
     IN accountId INT,
-    IN amount DECIMAL(10,2)
+    IN amount DECIMAL(15,2)
 )
 BEGIN
-    DECLARE current_balance DECIMAL(10,2);
+    DECLARE current_balance DECIMAL(15,2);
+    SELECT balance INTO current_balance FROM accounts WHERE account_id = accountId;
+    IF current_balance >= amount THEN
+        UPDATE accounts
+        SET balance = balance - amount
+        WHERE account_id = accountId;
+        INSERT INTO transactions (source_id, destination_id, transaction_type, amount)
+        VALUES (NULL, accountId, 'withdraw', amount);
+    ELSE
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insufficient balance';
+    END IF;
+END ><
+DELIMITER ;
+```
+### Withdraw Money
+```sql
+DELIMITER ><
+CREATE PROCEDURE withdraw_money(
+    IN accountId INT,
+    IN amount DECIMAL(15,2)
+)
+BEGIN
+    DECLARE current_balance DECIMAL(15,2);
     SELECT balance INTO current_balance FROM accounts WHERE account_id = accountId;
     IF current_balance >= amount THEN
         UPDATE accounts
@@ -225,5 +247,36 @@ END ><
 DELIMITER ;
 ```
 
+### Transfer Money
+```sql
+delimiter ><
+create procedure transfer_money(
+    in sourceId int,
+    in destinationId int,
+    in amounT decimal(15,2)
+)
+begin
+    declare current_balance decimal(15,2);
+    select balance into current_balance from accounts where account_id = sourceId;
+    if current_balance >= amounT then
+        update accounts
+        set balance = balance - amounT
+        where account_id = sourceId;
+        
+        update accounts
+        set balance = balance + amounT
+        where account_id = destinationId;
+
+        insert into transactions (source_id,destination_id, transaction_type, amount)
+        values (sourceId,destinationId, 'transfer', amounT);
+        insert into logs (description)
+        values (concat('Transfered $', amounT, ' from account id: ', sourceId,'To :',destinationId));
+    else
+        signal sqlstate '45000'
+        set message_text = 'insufficient balance';
+    end if;
+end><
+delimiter ;
+```
 This document outlines the SQL schema for a banking system, including table definitions, stored procedures, and functions.
 
