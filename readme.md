@@ -140,26 +140,25 @@ DELIMITER ;
 
 ### Sign In User
 ```sql
-DELIMITER ><
-CREATE PROCEDURE signin_user(
-    IN email_ VARCHAR(100),
-    IN pswd VARCHAR(255),
-    OUT customerId INT
-)
-BEGIN
-    DECLARE hashed_input_pswd CHAR(128);
-    DECLARE hashed_stored_pswd CHAR(128);
-    DECLARE salt CHAR(36);
-    DECLARE userId INT;
-    SELECT customer_id, hashed_pswd, user_salt INTO userId, hashed_stored_pswd, salt FROM customers WHERE email = email_;
-    SET hashed_input_pswd = hash_pswd(CONCAT(salt, pswd));
-    IF hashed_stored_pswd IS NULL OR hashed_stored_pswd != hashed_input_pswd THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid email or password';
-    ELSE
-        SET customerId = userId;
-    END IF;
-END ><
-DELIMITER ;
+delimiter ><
+create procedure signin_user(
+	in emaiL_ varchar(100),
+	in pswd varchar(255))
+begin
+	declare hashed_input_pswd char(128);
+	declare hashed_stored_pswd char(128);
+	declare salt char(36);
+	declare userId int;
+	select customer_id,hashed_pswd,user_salt  into userId,hashed_stored_pswd,salt from customers where email = emaiL_;
+	set hashed_input_pswd = hash_pswd(concat(salt,pswd));
+	if hashed_stored_pswd is null or hashed_stored_pswd != hashed_input_pswd then
+		signal sqlstate'45000' set message_text = 'Invalid email or password';
+	else 
+		select userId as customerId;
+	end if;
+end ><
+
+delimiter ;
 ```
 
 ### Open Account
@@ -168,8 +167,8 @@ delimiter ><
 create procedure open_account(
 	in customerId int,
 	in accountType enum('savings','current'),
-	in initialDeposit decimal(15,2),
-	out accountId int)
+	in initialDeposit decimal(15,2)
+	)
 begin
 	declare acc_no varchar(20);
 	declare accId int;
@@ -177,8 +176,7 @@ begin
 	insert into accounts (account_number, customer_id, account_type, balance) values (acc_no,customerId,accountType,initialDeposit);
 	insert into logs (description)
     	values (concat('account opened for customer id: ', customerId,'with initial balance',initialDeposit));
-	select account_id into accountId from accounts where customer_id = customerId order by created_at desc limit 1;
-
+	select account_id as accountId from accounts where customer_id = customerId order by created_at desc limit 1;
 end ><
 delimiter ;
 ```
