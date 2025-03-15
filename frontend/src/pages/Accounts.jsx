@@ -13,7 +13,7 @@ const Accounts = () => {
   const [formData, setFormData] = useState({
     customer_id,
     account_type: '',
-    balence: '',
+    balance: '',
   });
 
   const handleChange = (e) => {
@@ -37,7 +37,7 @@ const Accounts = () => {
       toast.error('Please select an account type');
       return;
     }
-    if (parseFloat(formData.balence) < 1000) {
+    if (parseFloat(formData.balance) < 1000) {
       toast.error('Minimum initial deposit is $1,000');
       return;
     }
@@ -57,7 +57,7 @@ const Accounts = () => {
         localStorage.setItem('accountId', response.data.accountId);
         setFormData({
           account_type: '',
-          balence: ''
+          balance: ''
         });
         window.location.href = '/dashboard';
       }
@@ -138,9 +138,9 @@ const Accounts = () => {
               </label>
               <Input
                 type="number"
-                name="balence"
+                name="balance"
                 placeholder="Enter initial deposit amount"
-                value={formData.balence}
+                value={formData.balance}
                 onChange={handleChange}
               />
             </div>

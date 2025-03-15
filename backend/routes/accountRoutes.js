@@ -5,7 +5,7 @@ const router = Router();
 
 router.post("/openAccount", openAccount);
 router.get("/getAccount/:customerId", getAccount);
-router.post("/withdraw/:customerId", withdraw);
-router.post("/deposit/:customerId", deposit);
+router.post("/withdraw/:accountId", withdraw);
+router.post("/deposit/:accountId", deposit);
 
 module.exports = router;

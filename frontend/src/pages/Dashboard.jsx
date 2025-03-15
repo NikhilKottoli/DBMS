@@ -42,6 +42,7 @@ const Dashboard = () => {
       const response = await axios.post(endpoint, data, {
         headers: { Authorization: `Bearer ${localStorage.getItem('customerId')}` }
       });
+      console.log(localStorage.getItem('customerId'));
       
       if (response.data) {
         toast.success(`${selectedAction.charAt(0).toUpperCase() + selectedAction.slice(1)} successful!`);
@@ -50,7 +51,8 @@ const Dashboard = () => {
         setSelectedAction(null);
       }
     } catch (error) {
-      toast.error('Transaction failed. Please try again.');
+      console.log(error);
+      toast.error(error.response.data.error);
     } finally {
       setIsLoading(false);
     }

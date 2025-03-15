@@ -67,12 +67,10 @@ const getUser = async (req, res) => {
 const handleSignin = async (req, res) => {
     const { email, password } = req.body;
     try {
-        const callProcedureQuery = 'CALL signin_user(?, ?, @customerId);';
-        await db.query(callProcedureQuery, [email, password]);
-        const selectQuery = 'SELECT @customerId AS customerId;';
-        const [rows] = await db.query(selectQuery);
+        const callProcedureQuery = 'CALL signin_user(?, ?);';
+        const [rows] =await db.query(callProcedureQuery, [email, password]);
         console.log("rows:", rows);
-        const customerId = rows[0]?.customerId;
+        const customerId = rows[0][0]?.customerId;
         console.log("customerId:", customerId);
         if (!customerId) {
             return res.status(401).json({ error: 'Invalid email or password' });
