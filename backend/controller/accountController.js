@@ -43,4 +43,31 @@ const getAccount = async (req, res) => {
     }
 }
 
-module.exports =  { openAccount,getAccount };
+const withdraw = async (req, res) => {
+    const { amount } = req.body;
+    const { customerId } = req.params;
+    console.log(req.body);
+    try {
+        const callProcedureQuery = 'CALL withdraw_money(?, ?);';
+        await db.query(callProcedureQuery, [parseInt(customerId, 10), parseInt(amount, 10)]);
+        return res.status(200).json({ message: "Withdraw successful" });
+    } catch (error) {
+        console.error("Withdraw error:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+}
+
+const deposit = async (req, res) => {
+    const { amount } = req.body;
+    const { customerId } = req.params;
+    try {
+        const callProcedureQuery = 'CALL deposit_money(?, ?);';
+        await db.query(callProcedureQuery, [parseInt(customerId, 10), parseInt(amount, 10)]);
+        return res.status(200).json({ message: "Deposit successful" });
+    } catch (error) {
+        console.error("Deposit error:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+}
+
+module.exports =  { openAccount,getAccount,withdraw,deposit };

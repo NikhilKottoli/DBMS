@@ -13,18 +13,9 @@ const Dashboard = () => {
   const [selectedAction, setSelectedAction] = useState(null);
   const [amount, setAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [recipientEmail, setRecipientEmail] = useState('');
+  const [recipientAccount, setrecipientAccount] = useState('');
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const id = localStorage.getItem('customerId'); 
-    if (id) {
-      setCustomerId(id); 
-    }
-    else {
-      window.location.href = '/signin';
-    }
-  }, []);
+  const [accountId, setAccountId] = useState(localStorage.getItem('accountId'));
 
   const handleLogout = async () => {
     localStorage.removeItem('customerId');
@@ -32,33 +23,22 @@ const Dashboard = () => {
     window.location.href = '/signin';
   };
 
-  useEffect (() => {
-    const fetchAccounts = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3000/account/getAccount/${customerId}`, {
-        });
-        console.log(response.data);
-        if(response.data.data.accounts.length === 0) {
-          window.location.href = '/accounts';
-        }
-      } catch (error) {
-        console.error('Failed to fetch accounts:', error);
-      }
+  useEffect(() => {
+    if (!customerId) {
+      window.location.href = '/signin';
     }
-    fetchAccounts();
-  }, [customerId]);
-
-  const handleProfile = async () => {
-    window.location.href = '/profile';
-  };
+    if(!accountId){
+      window.location.href = '/profile';
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const endpoint = `http://localhost:3000/${selectedAction}`;
-      const data = { amount, recipientEmail };
+      const endpoint = `http://localhost:3000/account/${selectedAction}/${accountId}`;
+      const data = { amount, recipientAccount };
       const response = await axios.post(endpoint, data, {
         headers: { Authorization: `Bearer ${localStorage.getItem('customerId')}` }
       });
@@ -66,7 +46,7 @@ const Dashboard = () => {
       if (response.data) {
         toast.success(`${selectedAction.charAt(0).toUpperCase() + selectedAction.slice(1)} successful!`);
         setAmount('');
-        setRecipientEmail('');
+        setrecipientAccount('');
         setSelectedAction(null);
       }
     } catch (error) {
@@ -83,13 +63,13 @@ const Dashboard = () => {
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         {selectedAction === 'transfer' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Recipient Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Recipient Account</label>
             <Input
-              type="email"
-              name="recipientEmail"
-              placeholder="Enter recipient's email"
-              value={recipientEmail}
-              onChange={(e) => setRecipientEmail(e.target.value)}
+              type="accountNumber"
+              name="recipientAccount"
+              placeholder="Enter recipient's Account Number"
+              value={recipientAccount}
+              onChange={(e) => setrecipientAccount(e.target.value)}
             />
           </div>
         )}
@@ -111,7 +91,6 @@ const Dashboard = () => {
   };
 
   const actions = [
-    { name: 'transactions', icon: History, label: 'Transaction History' },
     { name: 'withdraw', icon: ArrowUpRight, label: 'Withdraw' },
     { name: 'transfer', icon: ArrowDownLeft, label: 'Transfer' },
     { name: 'deposit', icon: PiggyBank, label: 'Deposit' },
