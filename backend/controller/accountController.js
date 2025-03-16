@@ -62,5 +62,18 @@ const deposit = async (req, res) => {
     }
 }
 
+const transfer = async (req, res) => {
+    const { amount, recipientAccount } = req.body;
+    const { accountId } = req.params;
+    try {
+        const ValidrecipientAccount = recipientAccount.replace('#','');
+        const callProcedureQuery = 'CALL transfer_money(?, ?, ?);';
+        await db.query(callProcedureQuery, [parseInt(accountId, 10), ValidrecipientAccount, parseInt(amount, 10)]);
+        return res.status(200).json({ message: "Transfer successful" });
+    } catch (error) {
+        console.error("Transfer error:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+}
 
-module.exports =  { openAccount,getAccount,withdraw,deposit };
+module.exports =  { openAccount,getAccount,withdraw,deposit,transfer };

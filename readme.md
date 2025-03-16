@@ -250,11 +250,13 @@ DELIMITER ;
 delimiter ><
 create procedure transfer_money(
     in sourceId int,
-    in destinationId int,
+    in destinationNumber varchar(20),
     in amounT decimal(15,2)
 )
 begin
+    declare destinationId int;
     declare current_balance decimal(15,2);
+    select account_id into destinationId from accounts where account_number = destinationNumber;
     select balance into current_balance from accounts where account_id = sourceId;
     if current_balance >= amounT then
         update accounts
@@ -273,6 +275,29 @@ begin
         signal sqlstate '45000'
         set message_text = 'insufficient balance';
     end if;
+end><
+delimiter ;
+```
+
+### Triggers
+```sql
+delimiter ><
+create trigger after_transaction
+after insert on transactions
+for each row
+begin
+    insert into logs (description)
+    values (concat('transaction of $', new.amount, ' made from : ', new.source_id,'to :',new.destination_id));
+end><
+delimiter ;
+
+delimiter ><
+create procedure view_transactions(
+    in accountId int
+)
+begin
+    select * from transactions
+    where account_id = accountId;
 end><
 delimiter ;
 ```
