@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { DatabaseIcon, Menu, X } from "lucide-react";
+import { DatabaseIcon } from "lucide-react";
 
 export default function Navbar() {
   const [loading, setLoading] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem('customerId');
     setLoading(true);
-    navigate("/signin");
+    window.location.href = '/signin';
   };
 
   return (
@@ -43,17 +42,18 @@ export default function Navbar() {
             Open Account
           </Link>
           <Link
-            to="/signup"
-            className="px-6 py-2 rounded-lg text-gray-700 font-medium transition duration-300 hover:bg-blue-500 hover:text-white"
-          >
-            Sign Up
-          </Link>
-          <Link
             to="/about"
             className="px-6 py-2 rounded-lg text-gray-700 font-medium transition duration-300 hover:bg-blue-500 hover:text-white"
           >
             About Us
           </Link>
+          <button
+            onClick={handleLogout}
+            disabled={loading}
+            className="px-6 py-2 rounded-lg bg-red-500 text-white font-medium transition duration-300 hover:bg-red-600 disabled:opacity-50"
+          >
+            {loading ? "Logging out..." : "Logout"}
+          </button>
         </div>
       </div>
     </nav>
