@@ -57,7 +57,8 @@ CREATE TABLE transactions (
 CREATE TABLE logs (
     log_id INT AUTO_INCREMENT PRIMARY KEY,
     description TEXT,
-    log_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    log_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    type int
 );
 ```
 
