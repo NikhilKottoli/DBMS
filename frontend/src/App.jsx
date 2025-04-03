@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import AboutUs from './pages/AboutUs';
 import Accounts from './pages/Accounts';
 import User from './pages/User';
+import ServerMonitor from './pages/Traffic'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/accounts" element={<Accounts />} />
         <Route path="/profile" element={<User />} />
+        <Route path="/traffic" element={<ServerMonitor />} />
       </Routes>
     </Router>
   );

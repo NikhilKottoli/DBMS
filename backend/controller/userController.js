@@ -1,8 +1,19 @@
 const db = require("../db");
-const bcrypt = require("bcrypt");
+
+const logToDatabase = async (description) => {
+    try {
+      await db.execute(
+        "INSERT INTO logs (description, type) VALUES (?, ?)",
+        [description, 1]
+      );
+    } catch (error) {
+      console.error("Error inserting log:", error);
+    }
+};
 
 const getUsers = async (req, res) => {
     try {
+        logToDatabase("Read Request from User");
         const [rows] = await db.query("SELECT * FROM customers");
         res.status(200).json({
             status: "success",

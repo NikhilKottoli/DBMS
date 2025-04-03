@@ -1,8 +1,23 @@
 const db = require("../db");
 
+const logToDatabase = async (description) => {
+    try {
+      await db.execute(
+        "INSERT INTO logs (description, type) VALUES (?, ?)",
+        [description, 2]
+      );
+    } catch (error) {
+      console.error("Error inserting log:", error);
+    }
+};
 
 const openAccount = async (req, res) => {
     const { customer_id, account_type, balance } = req.body;
+
+    if(!customer_id || !account_type || !balance) {
+        logToDatabase("Write Request from User");
+        return res.status(200).json({ error: "Missing required fields" });
+    }
     try {
         const callProcedureQuery = 'CALL open_account(?, ?, ?);';
         const [rows] =await db.query(callProcedureQuery, [customer_id, account_type, balance]);

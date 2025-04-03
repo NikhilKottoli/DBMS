@@ -47,6 +47,13 @@ export default function Navbar() {
           >
             About Us
           </Link>
+
+          <Link
+            to="/traffic"
+            className="px-6 py-2 rounded-lg text-gray-700 font-medium transition bg-blue-500 duration-300 hover:bg-blue-500 hover:text-white"
+          >
+            Simulate
+          </Link>
           <button
             onClick={handleLogout}
             disabled={loading}
