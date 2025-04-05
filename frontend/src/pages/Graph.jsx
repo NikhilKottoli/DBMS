@@ -15,42 +15,44 @@ const GraphPage = () => {
       try {
         const response = await fetch("http://localhost:3000/user/logs");
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
+  
         const result = await response.json();
         console.log("Fetched logs:", result);
         setData(result);
-
+  
         // Count read and write requests
         const readCount = result.filter(log => log.type === 1).length;
         const writeCount = result.filter(log => log.type === 2).length;
-
+  
         setChartData([
           { name: "Read Requests", count: readCount },
           { name: "Write Requests", count: writeCount },
         ]);
-
+  
         // Group requests by date
         const groupedByDate = result.reduce((acc, log) => {
           const date = log.log_date.split("T")[0]; // Extract YYYY-MM-DD
           if (!acc[date]) acc[date] = { date, reads: 0, writes: 0, total: 0 };
-
+  
           if (log.type === 1) acc[date].reads += 1;
           if (log.type === 2) acc[date].writes += 1;
-          acc[date].total += 1; // Sum both read and write requests
-
+          acc[date].total += 1;
+  
           return acc;
         }, {});
-
-        setDateWiseData(Object.values(groupedByDate)); // Convert object to array
+  
+        setDateWiseData(Object.values(groupedByDate));
       } catch (error) {
         console.error("Error fetching logs:", error);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchData();
-  }, []);
+  
+    const intervalId = setInterval(fetchData, 1000);
+  
+    return () => clearInterval(intervalId);
+  }, []);  
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
