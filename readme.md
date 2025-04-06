@@ -257,24 +257,29 @@ create procedure transfer_money(
 begin
     declare destinationId int;
     declare current_balance decimal(15,2);
-    select account_id into destinationId from accounts where account_number = destinationNumber;
-    select balance into current_balance from accounts where account_id = sourceId;
-    if current_balance >= amounT then
-        update accounts
-        set balance = balance - amounT
-        where account_id = sourceId;
-        
-        update accounts
-        set balance = balance + amounT
-        where account_id = destinationId;
-
-        insert into transactions (source_id,destination_id, transaction_type, amount)
-        values (sourceId,destinationId, 'transfer', amounT);
-        insert into logs (description)
-        values (concat('Transfered $', amounT, ' from account id: ', sourceId,'To :',destinationId));
-    else
+    select account_id into destinationId 
+    from accounts 
+    where account_number = destinationNumber;
+    if destinationId is null then
         signal sqlstate '45000'
-        set message_text = 'insufficient balance';
+        set message_text = 'Invalid recipient account number';
+    else
+        select balance into current_balance from accounts where account_id = sourceId;
+        if current_balance >= amounT then
+            update accounts
+            set balance = balance - amounT
+            where account_id = sourceId;
+            update accounts
+            set balance = balance + amounT
+            where account_id = destinationId;
+            insert into transactions (source_id, destination_id, transaction_type, amount)
+            values (sourceId, destinationId, 'transfer', amounT);
+            insert into logs (description)
+            values (concat('Transferred $', amounT, ' from account id: ', sourceId, ' to account id: ', destinationId));
+        else
+            signal sqlstate '45000'
+            set message_text = 'Insufficient balance';
+        end if;
     end if;
 end><
 delimiter ;
