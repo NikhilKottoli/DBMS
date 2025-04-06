@@ -16,7 +16,7 @@ const GraphPage = () => {
       try {
         const response = await fetch("http://localhost:3000/user/logs");
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
+  
         const result = await response.json();
         console.log("Fetched logs:", result);
         setData(result);
@@ -27,9 +27,16 @@ const GraphPage = () => {
         setLoading(false);
       }
     };
-
+  
+    // Fetch immediately once
     fetchData();
-  }, []);
+  
+    // Set interval to fetch every second
+    const intervalId = setInterval(fetchData, 1000);
+  
+    // Clear interval on unmount
+    return () => clearInterval(intervalId);
+  }, [timeFilter]);  
 
   // Process data whenever the time filter changes
   useEffect(() => {
