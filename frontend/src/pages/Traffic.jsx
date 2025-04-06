@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Gauge, Server, ArrowRight, BarChart } from 'lucide-react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 const ServerMonitor = () => {
   // Server states
   const [server1Status, setServer1Status] = useState('checking');
@@ -13,6 +15,9 @@ const ServerMonitor = () => {
   // Visualization state
   const [server1Metrics, setServer1Metrics] = useState({ total: 0, success: 0 });
   const [server2Metrics, setServer2Metrics] = useState({ total: 0, success: 0 });
+  
+  // For navigation
+  const navigate = useNavigate();
   
   // Simulate checking server status
   useEffect(() => {
@@ -53,7 +58,11 @@ const ServerMonitor = () => {
         targetUrl,
         timestamp: new Date().toLocaleTimeString(),
         status: 'pending',
-        targetServer
+        targetServer,
+        // Generate random execution time - reads are faster (5-50ms) than writes (100-300ms)
+        executionTime: type === 'read' 
+          ? Math.floor(Math.random() * 46 + 5) + 'ms'
+          : Math.floor(Math.random() * 200 + 100) + 'ms'
       };
       
       newRequests.push(newRequest);
@@ -103,6 +112,16 @@ const ServerMonitor = () => {
     
     // Update request history (keep only the last 20)
     setRequests(prev => [...newRequests, ...prev].slice(0, 20));
+  };
+  
+  const navigateToGraph = () => {
+    navigate('/graph', { 
+      state: { 
+        server1Metrics, 
+        server2Metrics,
+        requests 
+      } 
+    });
   };
   
   return (
@@ -211,6 +230,12 @@ const ServerMonitor = () => {
               Create READ Request
             </button>
             <button 
+              onClick={navigateToGraph}
+              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center"
+            >
+              <BarChart size={18} className="mr-1" /> Graph
+            </button>
+            <button 
               onClick={() => handleRequest('write')}
               className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded"
               disabled={server2Status === 'checking'}
@@ -285,12 +310,13 @@ const ServerMonitor = () => {
                 <th className="px-4 py-2 text-left">Type</th>
                 <th className="px-4 py-2 text-left">Target</th>
                 <th className="px-4 py-2 text-left">Status</th>
+                <th className="px-4 py-2 text-left">Exe. Time</th>
               </tr>
             </thead>
             <tbody>
               {requests.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="px-4 py-2 text-center text-gray-500">No requests yet</td>
+                  <td colSpan="5" className="px-4 py-2 text-center text-gray-500">No requests yet</td>
                 </tr>
               ) : (
                 requests.map(req => (
@@ -313,6 +339,7 @@ const ServerMonitor = () => {
                         {req.status}
                       </span>
                     </td>
+                    <td className="px-4 py-2">{req.executionTime}</td>
                   </tr>
                 ))
               )}

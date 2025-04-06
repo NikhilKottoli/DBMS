@@ -151,11 +151,20 @@ const handleSignup = async (req, res) => {
     }
 };
 
-
+const Logs = async (req, res) => {
+    try {
+        const [rows] = await db.query("SELECT * FROM logs ORDER BY log_id DESC;");
+        return res.status(200).json(rows);
+    } catch (error) {
+        console.error("Error fetching logs:", error);
+        return res.status(500).json({ error: "Internal Server Error" }); // Sends error response to frontend
+    }
+};
 module.exports = {
     getUsers,
     handleSignup,
     handleSignin,
     handleLogout,
     getUser,
+    Logs,
 };

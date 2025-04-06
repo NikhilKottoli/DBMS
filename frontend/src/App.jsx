@@ -8,6 +8,8 @@ import AboutUs from './pages/AboutUs';
 import Accounts from './pages/Accounts';
 import User from './pages/User';
 import ServerMonitor from './pages/Traffic'
+import GraphPage from './pages/Graph';
+
 
 function App() {
   return (
@@ -22,6 +24,7 @@ function App() {
         <Route path="/accounts" element={<Accounts />} />
         <Route path="/profile" element={<User />} />
         <Route path="/traffic" element={<ServerMonitor />} />
+        <Route path="/graph" element={<GraphPage />} />
       </Routes>
     </Router>
   );
