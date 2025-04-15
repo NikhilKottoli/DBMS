@@ -9,7 +9,7 @@ import Accounts from './pages/Accounts';
 import User from './pages/User';
 import ServerMonitor from './pages/Traffic'
 import GraphPage from './pages/Graph';
-import LoanDashboard from './pages/LoanDashboard';
+import ApplyLoan from './pages/LoanDashboard';
 
 function App() {
   return (
@@ -25,7 +25,7 @@ function App() {
         <Route path="/profile" element={<User />} />
         <Route path="/traffic" element={<ServerMonitor />} />
         <Route path="/graph" element={<GraphPage />} />
-        <Route path="/loans" element={<LoanDashboard />} />
+        <Route path="/loans" element={<ApplyLoan />} />
       </Routes>
     </Router>
   );

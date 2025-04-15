@@ -1,4 +1,5 @@
 const db = require("../db");
+const { all } = require("../routes/accountRoutes");
 
 const logToDatabase = async (description) => {
     try {
@@ -140,7 +141,7 @@ const getAllLoans = async (req, res) => {
 
 const approveLoan = async (req, res) => {
     const { loanId } = req.body;
-
+    console.log(req.body);
     try {
          await db.query("CALL approve_loan(?)", [loanId]);
         return res.status(200).json({
@@ -153,6 +154,21 @@ const approveLoan = async (req, res) => {
     }
 };
 
+const allLoans = async(req,res) =>{
+    try {
+        const [rows] = await db.query("SELECT * FROM loans");
+        res.status(200).json({
+            status: "success",
+            results: rows.length,
+            data: {
+                loans: rows,
+            },
+        });
+    } catch (err) {
+        console.error("Error fetching all loans:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
 
 
-module.exports =  { openAccount,getAccount,withdraw,deposit,transfer,applyLoan,getMyLoans ,getAllLoans,approveLoan};
+module.exports =  { openAccount,getAccount,withdraw,deposit,transfer,applyLoan,getMyLoans ,getAllLoans,approveLoan, allLoans};
