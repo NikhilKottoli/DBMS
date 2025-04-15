@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Gauge, Server, ArrowRight, BarChart } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 
 const ServerMonitor = () => {
   // Server states
@@ -125,6 +126,8 @@ const ServerMonitor = () => {
   };
   
   return (
+    <>
+    <Navbar />
     <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-6 text-center">Server Load Balancer Dashboard</h1>
       
@@ -348,6 +351,7 @@ const ServerMonitor = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

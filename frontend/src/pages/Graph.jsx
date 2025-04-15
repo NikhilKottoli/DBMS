@@ -3,6 +3,7 @@ import {
   BarChart, Bar, LineChart, Line, AreaChart, Area,
   XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid
 } from "recharts";
+import Navbar from "../components/Navbar";
 
 const GraphPage = () => {
   const [data, setData] = useState([]);
@@ -124,6 +125,8 @@ const GraphPage = () => {
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
   return (
+    <div>
+    <Navbar />
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-extrabold text-center mb-6 text-blue-700">Logs Data Visualization</h1>
 
@@ -272,6 +275,7 @@ const GraphPage = () => {
           </div>
         </>
       )}
+    </div>
     </div>
   );
 };
