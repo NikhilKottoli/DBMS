@@ -45,6 +45,9 @@ const Dashboard = () => {
       console.log(localStorage.getItem('customerId'));
       
       if (response.data) {
+        if (selectedAction === "loan")
+          toast.success('Loan application successful!');
+        else 
         toast.success(`${selectedAction.charAt(0).toUpperCase() + selectedAction.slice(1)} successful!`);
         setAmount('');
         setrecipientAccount('');

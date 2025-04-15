@@ -91,4 +91,68 @@ const transfer = async (req, res) => {
     }
 }
 
-module.exports =  { openAccount,getAccount,withdraw,deposit,transfer };
+const applyLoan = async (req, res) => {
+    const { amount } = req.body;
+    const { accountId } = req.params;
+
+    try {
+        const callProcedureQuery = 'CALL apply_loan(?, ?);';
+        await db.query(callProcedureQuery, [parseInt(accountId, 10), parseFloat(amount)]);
+        return res.status(200).json({ message: "Loan application submitted" });
+    } catch (error) {
+        console.error("Loan application error:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+};
+const getMyLoans = async (req, res) => {
+    const { accountId } = req.params;
+
+    try {
+        const [rows] = await db.query("CALL checkLoans(?)", [accountId]);
+        res.status(200).json({
+            status: "success",
+            results: rows[0].length,
+            data: {
+                loans: rows[0],
+            },
+        });
+    } catch (err) {
+        console.error("Error fetching loans:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+const getAllLoans = async (req, res) => {
+    try {
+        const [rows] = await db.query("CALL get_all_loans()");
+        res.status(200).json({
+            status: "success",
+            results: rows[0].length,
+            data: {
+                loans: rows[0],
+            },
+        });
+    } catch (err) {
+        console.error("Error fetching all loans:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+
+const approveLoan = async (req, res) => {
+    const { loanId } = req.body;
+
+    try {
+         await db.query("CALL approve_loan(?)", [loanId]);
+        return res.status(200).json({
+            status: "success",
+            message: `Loan ${loanId} approved`,
+        });
+    } catch (error) {
+        console.error("Error approving loan:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+
+
+module.exports =  { openAccount,getAccount,withdraw,deposit,transfer,applyLoan,getMyLoans ,getAllLoans,approveLoan};
