@@ -51,7 +51,18 @@ CREATE TABLE transactions (
     FOREIGN KEY (destination_id) REFERENCES accounts(account_id)
 );
 ```
-
+### Loans Table
+```sql
+CREATE TABLE loans (
+    loan_id INT AUTO_INCREMENT PRIMARY KEY,
+    account_id INT NOT NULL,
+    amount DECIMAL(15, 2) NOT NULL,
+    status ENUM('active', 'closed', 'defaulted','pending') NOT NULL, 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    start_date TIMESTAMP, 
+    FOREIGN KEY (account_id) REFERENCES accounts(account_id)
+);
+```
 ### Logs Table
 ```sql
 CREATE TABLE logs (
@@ -261,7 +272,83 @@ begin
 end><
 delimiter ;
 ```
+### Apply Loan
+```sql
+DELIMITER $$
 
+CREATE PROCEDURE apply_loan (
+    IN p_account_id INT,
+    IN p_amount DECIMAL(15,2)
+)
+BEGIN
+    INSERT INTO loans (
+        account_id,
+        amount,
+        status,
+        created_at,
+        start_date
+    )
+    VALUES (
+        p_account_id,
+        p_amount,
+        'pending',
+        CURRENT_TIMESTAMP,
+        NULL
+    );
+END $$
+DELIMITER ;
+
+```
+
+### CheckLoanStatus
+```sql
+DELIMITER $$
+
+CREATE PROCEDURE checkLoans(IN acc_id INT)
+BEGIN
+    SELECT 
+        amount,
+        status,
+        created_at
+    FROM loans
+    WHERE account_id = acc_id;
+END $$
+
+DELIMITER ;
+```
+### GetALlLoans
+```sql
+
+DELIMITER $$
+CREATE PROCEDURE get_all_loans()
+BEGIN
+    SELECT 
+        loan_id,
+        account_id,
+        amount,
+        status,
+        created_at,
+        start_date
+    FROM loans;
+END $$
+
+DELIMITER ;
+```
+### Approve Loans
+```sql
+DELIMITER $$
+
+CREATE PROCEDURE approve_loan(IN l_id INT)
+BEGIN
+    UPDATE loans
+    SET 
+        status = 'active',
+        start_date = CURRENT_TIMESTAMP
+    WHERE loan_id = l_id AND status = 'pending';
+END $$
+
+DELIMITER ;
+```
 ### Triggers
 ```sql
 delimiter ><
