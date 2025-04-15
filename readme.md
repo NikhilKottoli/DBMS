@@ -223,29 +223,6 @@ BEGIN
 END ><
 DELIMITER ;
 ```
-### Withdraw Money
-```sql
-DELIMITER ><
-CREATE PROCEDURE withdraw_money(
-    IN accountId INT,
-    IN amount DECIMAL(15,2)
-)
-BEGIN
-    DECLARE current_balance DECIMAL(15,2);
-    SELECT balance INTO current_balance FROM accounts WHERE account_id = accountId;
-    IF current_balance >= amount THEN
-        UPDATE accounts
-        SET balance = balance - amount
-        WHERE account_id = accountId;
-        INSERT INTO transactions (source_id, destination_id, transaction_type, amount)
-        VALUES (NULL, accountId, 'withdraw', amount);
-    ELSE
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insufficient balance';
-    END IF;
-END ><
-DELIMITER ;
-```
-
 ### Transfer Money
 ```sql
 delimiter ><
