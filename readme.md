@@ -17,6 +17,7 @@ CREATE TABLE customers (
     last_name VARCHAR(50) NOT NULL,
     email VARCHAR(100) UNIQUE,
     phone VARCHAR(15),
+    role_type ENUM('customer','admin') NOT NULL,
     address TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     hashed_pswd CHAR(128),
